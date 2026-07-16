@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Смена 2/2</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Смена 2/2">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-blobs">
+  <span class="blob blob-1"></span>
+  <span class="blob blob-2"></span>
+  <span class="blob blob-3"></span>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="app" id="app">
+
+    <!-- Header -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">2/2</div>
+        <div class="brand-text">
+          <h1>Мой график</h1>
+          <p id="rangeLabel">3 июля — 2 августа</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="settingsBtn" aria-label="Настройки" type="button">⚙️</button>
+        <div class="today-pill" id="todayPill">сегодня</div>
+      </div>
+    </header>
+
+    <!-- Progress -->
+    <section class="progress-card">
+      <div class="progress-top">
+        <span class="eyebrow">(Прогресс смены)</span>
+        <span class="progress-percent" id="progressPercent">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-bottom">
+        <span id="progressDaysLabel">День 0 из 31</span>
+        <span id="daysLeftLabel">Осталось 31 дн.</span>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-num" id="statWorked">0</span>
+        <span class="stat-label">Отработано</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="statRested">0</span>
+        <span class="stat-label">Отдохнул</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="statEasy">0</span>
+        <span class="stat-label">Лёгких смен</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="statHard">0</span>
+        <span class="stat-label">Сложных смен</span>
+      </div>
+    </section>
+
+    <!-- Legend -->
+    <section class="legend">
+      <span class="legend-item"><i class="dot dot-work"></i>Рабочий</span>
+      <span class="legend-item"><i class="dot dot-rest"></i>Отдых</span>
+      <span class="legend-item"><i class="dot dot-easy"></i>Легко</span>
+      <span class="legend-item"><i class="dot dot-hard"></i>Сложно</span>
+    </section>
+
+    <!-- Calendar -->
+    <section class="calendar-section">
+      <div class="section-head">
+        <span class="eyebrow">(Календарь)</span>
+        <span class="hint">свайпни, чтобы сменить месяц</span>
+      </div>
+      <div id="months" class="months-slider"></div>
+      <div id="monthDots" class="month-dots"></div>
+    </section>
+
+    <!-- Analytics -->
+    <section class="analytics-card">
+      <div class="section-head">
+        <span class="eyebrow">(Аналитика по неделям)</span>
+      </div>
+      <canvas id="trendChart" height="160"></canvas>
+    </section>
+
+    <footer class="foot">
+      <p>3 июля — 2 августа 2026 · график 2/2</p>
+    </footer>
+
+  </div>
+</div>
+
+<!-- Confetti canvas overlay -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- Bottom sheet for marking a work day -->
+<div class="sheet-overlay" id="sheetOverlay">
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <h2 id="sheetDate">3 июля</h2>
+    <p id="sheetSubtitle">Как прошёл рабочий день?</p>
+
+    <button class="pill pill-white" id="btnEasy">🙂 Легко</button>
+    <button class="pill pill-dark" id="btnHard">😮‍💨 Сложно</button>
+
+    <div class="field-row">
+      <label for="sheetNote">Заметка (необязательно)</label>
+      <textarea id="sheetNote" class="field-input field-textarea" rows="2" placeholder="Что было в этот день?"></textarea>
+    </div>
+
+    <button class="pill pill-ghost" id="btnClear">Сбросить отметку и заметку</button>
+
+    <button class="sheet-close" id="sheetClose">Отмена</button>
+  </div>
+</div>
+
+<!-- Bottom sheet: settings (schedule editor + notifications) -->
+<div class="sheet-overlay" id="settingsOverlay">
+  <div class="sheet sheet-tall" id="settingsSheet">
+    <div class="sheet-handle"></div>
+    <h2>Настройки графика</h2>
+    <p>Задай свой график работы — календарь и статистика пересчитаются</p>
+
+    <div class="field-row">
+      <label for="inputStart">Начало смены</label>
+      <input type="date" id="inputStart" class="field-input">
+    </div>
+
+    <div class="field-row">
+      <label for="inputEnd">Конец периода</label>
+      <input type="date" id="inputEnd" class="field-input">
+    </div>
+
+    <div class="field-row field-row-split">
+      <div>
+        <label for="inputWorkLen">Рабочих дней подряд</label>
+        <input type="number" id="inputWorkLen" class="field-input" min="1" max="14">
+      </div>
+      <div>
+        <label for="inputRestLen">Дней отдыха подряд</label>
+        <input type="number" id="inputRestLen" class="field-input" min="1" max="14">
+      </div>
+    </div>
+
+    <button class="pill pill-white" id="btnSaveSchedule">Сохранить график</button>
+
+    <div class="sheet-divider"></div>
+
+    <h2 class="sheet-subtitle">Напоминания</h2>
+    <p>Пришлём уведомление в выбранное время, если сегодняшний рабочий день ещё не отмечен</p>
+
+    <div class="field-row field-row-inline">
+      <label for="inputNotifTime">Время напоминания</label>
+      <input type="time" id="inputNotifTime" class="field-input field-input-small">
+    </div>
+
+    <button class="pill pill-dark" id="btnEnableNotif">🔔 Включить уведомления</button>
+    <button class="pill pill-ghost" id="btnTestNotif">Отправить тестовое уведомление</button>
+    <p class="notif-status" id="notifStatus"></p>
+
+    <button class="sheet-close" id="settingsClose">Закрыть</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
