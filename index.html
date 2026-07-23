@@ -42,11 +42,17 @@
           <p id="rangeLabel">3 июля — 2 августа</p>
         </div>
       </div>
-      <div class="header-actions">
-        <button class="icon-btn" id="settingsBtn" aria-label="Настройки" type="button">⚙️</button>
-        <div class="today-pill" id="todayPill">сегодня</div>
-      </div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Настройки" type="button">⚙️</button>
     </header>
+
+    <!-- Today hero card -->
+    <section class="today-card" id="todayCard">
+      <div class="today-card-info">
+        <span class="today-card-date" id="todayCardDate">23 июля</span>
+        <span class="today-card-status" id="todayCardStatus">Рабочий день</span>
+      </div>
+      <button class="today-card-btn" id="todayCardBtn" type="button">Отметить</button>
+    </section>
 
     <!-- Progress -->
     <section class="progress-card">
@@ -83,19 +89,17 @@
       </div>
     </section>
 
-    <!-- Legend -->
-    <section class="legend">
-      <span class="legend-item"><i class="dot dot-work"></i>Рабочий</span>
-      <span class="legend-item"><i class="dot dot-rest"></i>Отдых</span>
-      <span class="legend-item"><i class="dot dot-easy"></i>Легко</span>
-      <span class="legend-item"><i class="dot dot-hard"></i>Сложно</span>
-    </section>
-
     <!-- Calendar -->
     <section class="calendar-section">
       <div class="section-head">
         <span class="eyebrow">(Календарь)</span>
-        <span class="hint">свайпни, чтобы сменить месяц</span>
+        <button class="legend-toggle" id="legendToggle" type="button" aria-label="Показать легенду">ⓘ</button>
+      </div>
+      <div class="legend" id="legend">
+        <span class="legend-item"><i class="dot dot-work"></i>Рабочий</span>
+        <span class="legend-item"><i class="dot dot-rest"></i>Отдых</span>
+        <span class="legend-item"><i class="dot dot-easy"></i>Легко</span>
+        <span class="legend-item"><i class="dot dot-hard"></i>Сложно</span>
       </div>
       <div id="months" class="months-slider"></div>
       <div id="monthDots" class="month-dots"></div>
@@ -103,10 +107,13 @@
 
     <!-- Analytics -->
     <section class="analytics-card">
-      <div class="section-head">
+      <button class="section-head analytics-toggle" id="analyticsToggle" type="button">
         <span class="eyebrow">(Аналитика по неделям)</span>
+        <span class="analytics-arrow" id="analyticsArrow">▾</span>
+      </button>
+      <div class="analytics-body" id="analyticsBody">
+        <canvas id="trendChart" height="160"></canvas>
       </div>
-      <canvas id="trendChart" height="160"></canvas>
     </section>
 
     <footer class="foot">
