@@ -17,7 +17,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,7 +25,6 @@
 <div class="bg-blobs">
   <span class="blob blob-1"></span>
   <span class="blob blob-2"></span>
-  <span class="blob blob-3"></span>
 </div>
 
 <div class="phone">
@@ -33,66 +32,62 @@
 
   <div class="app" id="app">
 
-    <!-- Header -->
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark">2/2</div>
-        <div class="brand-text">
-          <h1>Мой график</h1>
-          <p id="rangeLabel">3 июля — 2 августа</p>
-        </div>
+    <!-- Top pills + settings -->
+    <header class="topbar-v2">
+      <div class="top-pills">
+        <span class="stat-pill" id="streakPill">🔥 0</span>
+        <span class="stat-pill" id="totalEasyPill">🏆 0</span>
       </div>
-      <button class="icon-btn" id="settingsBtn" aria-label="Настройки" type="button">⚙️</button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Настройки" type="button">⚙</button>
     </header>
 
-    <!-- Today hero card -->
-    <section class="today-card" id="todayCard">
-      <div class="today-card-info">
-        <span class="today-card-date" id="todayCardDate">23 июля</span>
-        <span class="today-card-status" id="todayCardStatus">Рабочий день</span>
+    <!-- Big date hero -->
+    <section class="date-hero">
+      <div class="date-hero-text">
+        <span class="date-hero-greet">Твой график 2/2</span>
+        <span class="date-hero-sub" id="rangeLabel">3 июля — 1 августа</span>
       </div>
-      <button class="today-card-btn" id="todayCardBtn" type="button">Отметить</button>
-    </section>
-
-    <!-- Progress -->
-    <section class="progress-card">
-      <div class="progress-top">
-        <span class="eyebrow">(Прогресс смены)</span>
-        <span class="progress-percent" id="progressPercent">0%</span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <div class="progress-bottom">
-        <span id="progressDaysLabel">День 0 из 31</span>
-        <span id="daysLeftLabel">Осталось 31 дн.</span>
+      <div class="date-hero-num">
+        <span class="date-hero-month" id="heroMonth">ИЮЛ</span>
+        <span class="date-hero-day" id="heroDay">23</span>
       </div>
     </section>
 
-    <!-- Stats -->
-    <section class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-num" id="statWorked">0</span>
-        <span class="stat-label">Отработано</span>
+    <!-- Week strip -->
+    <section class="week-strip" id="weekStrip"></section>
+
+    <!-- Habit-style streak card -->
+    <section class="habit-card" id="habitCard">
+      <div class="habit-head">
+        <span class="habit-title" id="habitTitle">Рабочий день</span>
+        <span class="habit-meta" id="habitMeta">график 2/2</span>
       </div>
-      <div class="stat-card">
-        <span class="stat-num" id="statRested">0</span>
-        <span class="stat-label">Отдохнул</span>
+      <div class="habit-row" id="habitRow"></div>
+    </section>
+
+    <!-- Progress ring + days-left hero row -->
+    <section class="hero-grid">
+      <div class="hero-card ring-card">
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 100 100">
+            <circle class="ring-bg" cx="50" cy="50" r="42"></circle>
+            <circle class="ring-fg" id="ringFg" cx="50" cy="50" r="42"></circle>
+          </svg>
+          <span class="ring-value" id="progressPercent">0%</span>
+        </div>
+        <span class="hero-label">Прогресс смены</span>
       </div>
-      <div class="stat-card">
-        <span class="stat-num" id="statEasy">0</span>
-        <span class="stat-label">Лёгких смен</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num" id="statHard">0</span>
-        <span class="stat-label">Сложных смен</span>
+
+      <div class="hero-card number-card">
+        <span class="hero-number" id="daysLeftNumber">0</span>
+        <span class="hero-label" id="daysLeftLabel">дней осталось</span>
       </div>
     </section>
 
-    <!-- Calendar -->
+    <!-- Dot-grid heatmap months -->
     <section class="calendar-section">
       <div class="section-head">
-        <span class="eyebrow">(Календарь)</span>
+        <span class="eyebrow">(Обзор смены)</span>
         <button class="legend-toggle" id="legendToggle" type="button" aria-label="Показать легенду">ⓘ</button>
       </div>
       <div class="legend" id="legend">
@@ -103,6 +98,23 @@
       </div>
       <div id="months" class="months-slider"></div>
       <div id="monthDots" class="month-dots"></div>
+    </section>
+
+    <!-- Aggregate stat bar -->
+    <section class="statbar" id="statbarWorked">
+      <div class="statbar-text">
+        <span class="statbar-label">Отработано дней</span>
+        <span class="statbar-sub">за весь период</span>
+      </div>
+      <span class="statbar-num" id="statWorked">0</span>
+    </section>
+
+    <section class="statbar" id="statbarSplit">
+      <div class="statbar-text">
+        <span class="statbar-label">Лёгких / Сложных</span>
+        <span class="statbar-sub">по отметкам</span>
+      </div>
+      <span class="statbar-num statbar-split" id="statEasyHard">0 / 0</span>
     </section>
 
     <!-- Analytics -->
@@ -117,10 +129,20 @@
     </section>
 
     <footer class="foot">
-      <p>3 июля — 2 августа 2026 · график 2/2</p>
+      <p>3 июля — 1 августа 2026 · график 2/2</p>
     </footer>
 
+    <div class="nav-spacer"></div>
   </div>
+
+  <!-- Bottom pill navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-dot-btn" id="navQuickBtn" aria-label="Отметить сегодня" type="button">
+      <span class="nav-dot" id="navDot"></span>
+    </button>
+    <button class="nav-plus-btn" id="navPlusBtn" aria-label="Настройки" type="button">+</button>
+    <button class="nav-grid-btn" id="navGridBtn" aria-label="К календарю" type="button">▦</button>
+  </nav>
 </div>
 
 <!-- Confetti canvas overlay -->
