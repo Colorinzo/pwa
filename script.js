@@ -8,7 +8,7 @@ const CONFETTI_SHOWN_KEY = 'shift-2-2-confetti-shown';
 
 const DEFAULT_SETTINGS = {
   start: '2026-07-03',
-  end: '2026-08-02',
+  end: '2026-08-01',
   workLen: 2,
   restLen: 2,
 };
@@ -151,12 +151,6 @@ function computeStats() {
 
 // ---------- Rendering: header & stats ----------
 function renderHeader() {
-  const today = startOfDay(new Date());
-  const pill = document.getElementById('todayPill');
-  const d = today.getDate();
-  const m = MONTH_NAMES[today.getMonth()];
-  pill.textContent = `сегодня, ${d} ${m}`;
-
   const rangeLabel = document.getElementById('rangeLabel');
   const startD = START.getDate(), startM = MONTH_NAMES[START.getMonth()];
   const endD = END.getDate(), endM = MONTH_NAMES[END.getMonth()];
@@ -392,11 +386,90 @@ function renderTrendChart() {
   });
 }
 
+// ---------- Rendering: today hero card ----------
+const todayCard = document.getElementById('todayCard');
+const todayCardDate = document.getElementById('todayCardDate');
+const todayCardStatus = document.getElementById('todayCardStatus');
+const todayCardBtn = document.getElementById('todayCardBtn');
+
+function renderTodayCard() {
+  const today = startOfDay(new Date());
+  const d = today.getDate();
+  const m = MONTH_NAMES[today.getMonth()];
+  todayCardDate.textContent = `Сегодня, ${d} ${m}`;
+
+  todayCardBtn.className = 'today-card-btn';
+  todayCardBtn.onclick = null;
+  todayCardBtn.disabled = false;
+
+  if (today < startOfDay(START)) {
+    todayCardStatus.textContent = 'Смена ещё не началась';
+    todayCardBtn.classList.add('is-rest');
+    todayCardBtn.textContent = 'Скоро';
+    todayCardBtn.disabled = true;
+    return;
+  }
+  if (today > startOfDay(END)) {
+    todayCardStatus.textContent = 'Смена завершена 🎉';
+    todayCardBtn.classList.add('is-rest');
+    todayCardBtn.textContent = 'Готово';
+    todayCardBtn.disabled = true;
+    return;
+  }
+
+  const work = isWorkDay(today);
+  const iso = toISO(today);
+
+  if (!work) {
+    todayCardStatus.textContent = 'Выходной 😌';
+    todayCardBtn.textContent = 'Отдыхай';
+    todayCardBtn.classList.add('is-rest');
+    todayCardBtn.disabled = true;
+    return;
+  }
+
+  todayCardStatus.textContent = 'Рабочий день';
+  const mark = marks[iso];
+  if (mark === 'easy') {
+    todayCardBtn.textContent = '🙂 Легко';
+    todayCardBtn.classList.add('is-marked-easy');
+  } else if (mark === 'hard') {
+    todayCardBtn.textContent = '😮\u200d💨 Сложно';
+    todayCardBtn.classList.add('is-marked-hard');
+  } else {
+    todayCardBtn.textContent = 'Отметить';
+  }
+  todayCardBtn.onclick = () => openSheet(today);
+}
+
+// ---------- Legend toggle ----------
+const legendToggle = document.getElementById('legendToggle');
+const legendEl = document.getElementById('legend');
+let legendOpen = false;
+legendToggle.addEventListener('click', () => {
+  legendOpen = !legendOpen;
+  legendEl.classList.toggle('open', legendOpen);
+});
+
+// ---------- Analytics collapse (lazy chart render) ----------
+const analyticsToggle = document.getElementById('analyticsToggle');
+const analyticsBody = document.getElementById('analyticsBody');
+let analyticsOpen = false;
+analyticsToggle.addEventListener('click', () => {
+  analyticsOpen = !analyticsOpen;
+  analyticsBody.classList.toggle('open', analyticsOpen);
+  analyticsToggle.classList.toggle('open', analyticsOpen);
+  if (analyticsOpen) {
+    requestAnimationFrame(() => renderTrendChart());
+  }
+});
+
 function renderAll() {
   renderHeader();
+  renderTodayCard();
   renderStats();
   renderCalendar();
-  renderTrendChart();
+  if (analyticsOpen) renderTrendChart();
 }
 
 // ---------- Bottom sheet: mark a work day ----------
@@ -734,6 +807,15 @@ if ('serviceWorker' in navigator) {
 }
 
 // ---------- Init ----------
+const MIGRATION_KEY = 'shift-2-2-migrated-aug1';
+if (!localStorage.getItem(MIGRATION_KEY)) {
+  if (settings.end === '2026-08-02') {
+    settings.end = '2026-08-01';
+    saveJSON(SETTINGS_KEY, settings);
+  }
+  localStorage.setItem(MIGRATION_KEY, '1');
+}
+
 rebuildSchedule();
 renderAll();
 updateNotifStatusLabel();
